@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3 Months 🐱💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:       #e8567a;
+      --rose-light: #f7a8bc;
+      --blush:      #fce8ee;
+      --cream:      #fff9f5;
+      --text-dark:  #3a2030;
+      --text-mid:   #7a4060;
+      --glow-yes:   0 0 18px 4px #f7a8bc, 0 0 40px 10px #e8567a55;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── ANIMATED GRADIENT BACKGROUND ─────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -2;
+      background: radial-gradient(ellipse at 20% 30%, #fce8ee 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 70%, #ffdde8 0%, transparent 55%),
+                  radial-gradient(ellipse at 50% 50%, #fff5f8 0%, transparent 80%);
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+    @keyframes bgPulse {
+      from { opacity: 0.8; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── PARTICLE CANVAS ──────────────────────────────── */
+    #particle-canvas {
+      position: fixed; inset: 0; z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ─── LAYOUT ───────────────────────────────────────── */
+    #app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      gap: 2rem;
+      text-align: center;
+    }
+
+    /* ─── HEADER BADGE ──────────────────────────────────── */
+    #badge {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.75rem, 2vw, 0.9rem);
+      letter-spacing: 0.15em;
+      color: var(--rose);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--rose-light);
+      padding: 0.4rem 1.2rem;
+      border-radius: 99px;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    /* ─── CAT IMAGE ─────────────────────────────────────── */
+    #image-wrap {
+      position: relative;
+      width: clamp(180px, 40vw, 260px);
+      height: clamp(180px, 40vw, 260px);
+    }
+    #image-wrap img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      border-radius: 1.5rem;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      filter: drop-shadow(0 8px 24px rgba(232,86,122,0.25));
+    }
+    #image-wrap img.hidden { opacity: 0; transform: scale(0.9); }
+    #image-wrap img.visible { opacity: 1; transform: scale(1); }
+
+    /* pulse ring behind cat */
+    #image-wrap::after {
+      content: '';
+      position: absolute; inset: -8px;
+      border-radius: 1.8rem;
+      border: 2px solid transparent;
+      background: linear-gradient(var(--cream),var(--cream)) padding-box,
+                  linear-gradient(135deg,#e8567a,#f7a8bc,#e8567a) border-box;
+      animation: ringPulse 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ringPulse {
+      0%,100% { opacity: 0.4; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.03); }
+    }
+
+    /* ─── QUESTION TEXT ──────────────────────────────────── */
+    #question {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      line-height: 1.4;
+      color: var(--text-dark);
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.5s forwards;
+      transition: opacity 0.4s ease;
+    }
+    #question span { color: var(--rose); }
+
+    /* ─── BUTTONS ────────────────────────────────────────── */
+    #options {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    .btn {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.4s ease,
+                  font-size 0.4s ease, opacity 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.15);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn:hover::after { opacity: 1; }
+    .btn:active { transform: scale(0.96) !important; }
+
+    /* YES button */
+    #yes-btn {
+      background: linear-gradient(135deg, #e8567a, #c94070);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(232,86,122,0.4);
+      font-size: 1rem; /* will scale up progressively */
+    }
+    #yes-btn:hover {
+      transform: scale(1.07);
+      box-shadow: var(--glow-yes);
+    }
+
+    /* NO button */
+    #no-btn {
+      background: rgba(255,255,255,0.6);
+      color: var(--text-mid);
+      border: 1.5px solid var(--rose-light);
+      backdrop-filter: blur(6px);
+    }
+    #no-btn:hover { transform: scale(1.04); }
+    #no-btn.dodge { transition: left 0.12s ease, top 0.12s ease; position: fixed; }
+
+    /* ─── FINAL MESSAGE ──────────────────────────────────── */
+    #final {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      max-width: 520px;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    #final.show { opacity: 1; transform: scale(1); }
+
+    #final-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      color: var(--rose);
+      line-height: 1.2;
+    }
+    #final-msg {
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      color: var(--text-mid);
+      line-height: 1.8;
+      font-weight: 300;
+    }
+    #final-sig {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--rose);
+      font-size: 1.1rem;
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes celebBg {
+      0%   { background-color: var(--cream); }
+      25%  { background-color: #fff0f4; }
+      50%  { background-color: #fce8ee; }
+      75%  { background-color: #fff5f7; }
+      100% { background-color: var(--cream); }
+    }
+    .celeb-bg { animation: celebBg 3s ease forwards; }
+
+    /* ─── MUSIC TOGGLE ───────────────────────────────────── */
+    #music-btn {
+      position: fixed; top: 1rem; right: 1rem;
+      background: rgba(255,255,255,0.75);
+      border: 1.5px solid var(--rose-light);
+      border-radius: 99px;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--rose);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      font-family: 'Lato', sans-serif;
+      transition: background 0.2s, transform 0.2s;
+    }
+    #music-btn:hover { background: #ffe0e9; transform: scale(1.05); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 480px) {
+      #options { flex-direction: column; align-items: center; }
+      .btn { width: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<button id="music-btn" aria-label="Toggle music">🎵 Music</button>
+
+<div id="app">
+  <div id="badge">3 months of us 🐾</div>
+
+  <div id="image-wrap">
+    <img id="cat-img"      src="cat.gif"      alt="Cute cat" class="visible"/>
+    <img id="cat-heart-img" src="cat-heart.gif" alt="Cat with hearts" class="hidden"
+         style="position:absolute;inset:0;"/>
+  </div>
+
+  <p id="question">Will you be my <span>forever Valentine</span>?&nbsp;🌸</p>
+
+  <div id="options">
+    <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
+    <button id="no-btn"  class="btn" onclick="handleNo()">No</button>
+  </div>
+
+  <div id="final">
+    <div id="final-title">Happy 3rd Monthsary, love 🌷</div>
+    <p id="final-msg"></p>
+    <div id="final-sig">— yours, always 💌</div>
+  </div>
+</div>
+
+<!-- soft background music (royalty-free; swap src to your own file) -->
+<audio id="bg-music" loop preload="none">
+  <!-- Add your own music file here: <source src="music.mp3" type="audio/mpeg"/> -->
+</audio>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+const state = {
+  noCount:    0,
+  dodging:    false,
+  celebrated: false,
+  musicOn:    false,
+};
+
+/* ═══════════════════════════════════════════════════
+   NO BUTTON RESPONSES
+═══════════════════════════════════════════════════ */
+const noResponses = [
+  { label: 'You sure? 🥺',       question: 'Are you really sure about that? 🐱' },
+  { label: 'Really sure?',        question: 'The cat is a little sad now… 😿' },
+  { label: 'Think again…',        question: 'Three whole months and you say no? 💔' },
+  { label: 'Last chance!',        question: 'Okay okay, last chance, I promise 🙏' },
+  { label: 'Please? 🥹',          question: 'The cat is begging you… look at those eyes 🐾' },
+  { label: 'Come on!!',           question: 'I\'ll share my snacks. That\'s my final offer. 🍪' },
+  { label: '…seriously?',         question: 'Fine. BUT THE CAT DISAGREES. 😤🐱' },
+];
+
+/* ═══════════════════════════════════════════════════
+   FINAL LOVE MESSAGE (typed out)
+═══════════════════════════════════════════════════ */
+const finalMessage =
+  "Three months doesn't sound like much, but with you, every single day has felt like a little adventure. " +
+  "Thank you for the late-night talks, the random jokes, the quiet moments that mean everything. " +
+  "I love who I am when I'm with you — and I love who you are, always. " +
+  "Here's to many more months, more memories, and more reasons to smile. 🌸";
+
+/* ═══════════════════════════════════════════════════
+   HANDLE YES
+═══════════════════════════════════════════════════ */
+function handleYes() {
+  if (state.celebrated) return;
+  state.celebrated = true;
+
+  swapImage();
+  document.getElementById('options').style.opacity = '0';
+  document.getElementById('question').style.opacity = '0';
+
+  setTimeout(() => {
+    document.getElementById('options').style.display = 'none';
+    document.getElementById('question').style.display = 'none';
+    launchCelebration();
+  }, 500);
+}
+
+/* ═══════════════════════════════════════════════════
+   HANDLE NO
+═══════════════════════════════════════════════════ */
+function handleNo() {
+  state.noCount++;
+  const idx     = Math.min(state.noCount - 1, noResponses.length - 1);
+  const resp    = noResponses[idx];
+  const noBtn   = document.getElementById('no-btn');
+  const yesBtn  = document.getElementById('yes-btn');
+  const question= document.getElementById('question');
+
+  // Update labels & question
+  noBtn.textContent   = resp.label;
+  updateQuestion(resp.question);
+
+  // Grow yes button (max ~2.4rem)
+  const currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+  const newSize     = Math.min(currentSize * 1.35, 38);
+  yesBtn.style.fontSize = newSize + 'px';
+  yesBtn.style.padding  = `${0.75 + state.noCount * 0.08}rem ${2 + state.noCount * 0.15}rem`;
+  yesBtn.style.boxShadow = `0 0 ${8 + state.noCount * 6}px ${2 + state.noCount * 2}px rgba(232,86,122,${0.3 + state.noCount * 0.07})`;
+
+  // Fade out no button a little
+  noBtn.style.opacity = Math.max(0.25, 1 - state.noCount * 0.12).toString();
+
+  // Start dodging after 4 clicks
+  if (state.noCount >= 4 && !state.dodging) {
+    state.dodging = true;
+    enableDodge();
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   QUESTION UPDATE (fade transition)
+═══════════════════════════════════════════════════ */
+function updateQuestion(text) {
+  const q = document.getElementById('question');
+  q.style.opacity = '0';
+  q.style.transform = 'translateY(8px)';
+  setTimeout(() => {
+    q.innerHTML = text;
+    q.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    q.style.opacity = '1';
+    q.style.transform = 'translateY(0)';
+  }, 300);
+}
+
+/* ═══════════════════════════════════════════════════
+   DODGE BEHAVIOUR
+═══════════════════════════════════════════════════ */
+function enableDodge() {
+  const btn = document.getElementById('no-btn');
+  const rect = btn.getBoundingClientRect();
+  btn.style.position = 'fixed';
+  btn.style.left     = rect.left + 'px';
+  btn.style.top      = rect.top  + 'px';
+  btn.style.transition = 'left 0.15s ease, top 0.15s ease, opacity 0.4s';
+  btn.style.zIndex   = '200';
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('touchmove', onTouchMove, { passive: true });
+}
+
+function dodgeFrom(cx, cy) {
+  const btn  = document.getElementById('no-btn');
+  const rect = btn.getBoundingClientRect();
+  const bx   = rect.left + rect.width  / 2;
+  const by   = rect.top  + rect.height / 2;
+  const dist = Math.hypot(cx - bx, cy - by);
+
+  if (dist < 120) {
+    const angle = Math.atan2(by - cy, bx - cx);
+    const flee  = 140 - dist;
+    let nx = rect.left + Math.cos(angle) * flee;
+    let ny = rect.top  + Math.sin(angle) * flee;
+    // clamp to viewport
+    nx = Math.max(0, Math.min(window.innerWidth  - rect.width,  nx));
+    ny = Math.max(0, Math.min(window.innerHeight - rect.height, ny));
+    btn.style.left = nx + 'px';
+    btn.style.top  = ny + 'px';
+  }
+}
+
+function onMouseMove(e)  { dodgeFrom(e.clientX, e.clientY); }
+function onTouchMove(e)  {
+  const t = e.touches[0];
+  dodgeFrom(t.clientX, t.clientY);
+}
+
+/* ═══════════════════════════════════════════════════
+   IMAGE SWAP
+═══════════════════════════════════════════════════ */
+function swapImage() {
+  const cat      = document.getElementById('cat-img');
+  const catHeart = document.getElementById('cat-heart-img');
+  cat.classList.remove('visible'); cat.classList.add('hidden');
+  setTimeout(() => {
+    catHeart.classList.remove('hidden'); catHeart.classList.add('visible');
+  }, 350);
+}
+
+/* ═══════════════════════════════════════════════════
+   CELEBRATION
+═══════════════════════════════════════════════════ */
+function launchCelebration() {
+  document.body.classList.add('celeb-bg');
+  startParticles();
+
+  setTimeout(() => {
+    const final = document.getElementById('final');
+    final.style.display = 'flex';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => final.classList.add('show'));
+    });
+    typeMessage(finalMessage, document.getElementById('final-msg'));
+  }, 700);
+}
+
+/* ═══════════════════════════════════════════════════
+   TYPING EFFECT
+═══════════════════════════════════════════════════ */
+function typeMessage(text, el, speed = 28) {
+  el.textContent = '';
+  let i = 0;
+  const tick = setInterval(() => {
+    el.textContent += text[i++];
+    if (i >= text.length) clearInterval(tick);
+  }, speed);
+}
+
+/* ═══════════════════════════════════════════════════
+   PARTICLE SYSTEM (canvas hearts & dots)
+═══════════════════════════════════════════════════ */
+const canvas  = document.getElementById('particle-canvas');
+const ctx     = canvas.getContext('2d');
+let particles = [];
+let animating = false;
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const HEART_CHARS = ['❤', '💕', '🌸', '✨', '💖', '🌷'];
+
+function spawnParticle() {
+  return {
+    x:       Math.random() * canvas.width,
+    y:       canvas.height + 20,
+    vy:      -(1.2 + Math.random() * 2.2),
+    vx:      (Math.random() - 0.5) * 0.8,
+    size:    14 + Math.random() * 18,
+    opacity: 0.7 + Math.random() * 0.3,
+    char:    HEART_CHARS[Math.floor(Math.random() * HEART_CHARS.length)],
+    drift:   (Math.random() - 0.5) * 0.015,
+  };
+}
+
+function startParticles() {
+  animating = true;
+  for (let i = 0; i < 30; i++) {
+    const p = spawnParticle();
+    p.y = Math.random() * canvas.height; // seed at various heights first
+    particles.push(p);
+  }
+  animateParticles();
+}
+
+function animateParticles() {
+  if (!animating) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // spawn new ones gradually
+  if (particles.length < 60 && Math.random() < 0.25) {
+    particles.push(spawnParticle());
+  }
+
+  particles = particles.filter(p => p.opacity > 0.02);
+
+  for (const p of particles) {
+    p.x  += p.vx;
+    p.y  += p.vy;
+    p.vx += p.drift;
+    p.opacity -= 0.002;
+
+    ctx.globalAlpha = Math.max(0, p.opacity);
+    ctx.font        = `${p.size}px serif`;
+    ctx.textAlign   = 'center';
+    ctx.fillText(p.char, p.x, p.y);
+  }
+
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+
+/* ═══════════════════════════════════════════════════
+   MUSIC TOGGLE
+═══════════════════════════════════════════════════ */
+const musicBtn = document.getElementById('music-btn');
+const audio    = document.getElementById('bg-music');
+
+musicBtn.addEventListener('click', () => {
+  if (state.musicOn) {
+    audio.pause();
+    musicBtn.textContent = '🎵 Music';
+  } else {
+    audio.play().catch(() => {}); // autoplay may need gesture
+    musicBtn.textContent = '🔇 Mute';
+  }
+  state.musicOn = !state.musicOn;
+});
+
+/* ═══════════════════════════════════════════════════
+   AMBIENT IDLE HEARTS (before yes is clicked)
+═══════════════════════════════════════════════════ */
+function idleHearts() {
+  if (animating) return; // stop once celebration starts
+  if (Math.random() < 0.12) {
+    const p = spawnParticle();
+    p.size    = 10 + Math.random() * 10;
+    p.opacity = 0.25 + Math.random() * 0.2;
+    p.vy      = -(0.5 + Math.random() * 1);
+    particles.push(p);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(q => q.opacity > 0.01);
+    for (const q of particles) {
+      q.x += q.vx; q.y += q.vy; q.opacity -= 0.003;
+      ctx.globalAlpha = Math.max(0, q.opacity);
+      ctx.font = `${q.size}px serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(q.char, q.x, q.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(idleHearts);
+}
+idleHearts();
+</script>
+</body>
+</html>
